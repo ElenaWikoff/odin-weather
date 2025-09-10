@@ -1,33 +1,40 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { fetchQueryWeather } from './utils/api';
+import { capitalizeWords } from './utils/functions';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [data, setData] = useState();
+  const [query, setQuery] = useState("london");
+
+  useEffect(() => {
+    fetchQueryWeather("london").then((data) => setData(data));
+  }, []);
 
   return (
     <>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        {!data ? <p>Loading...</p> :
+        <div>
+          {/* Header */}
+          <div className="header">
+            <h1>
+              {`${capitalizeWords(data.resolvedAddress)} `}
+              <span className="coords">{`(${data.latitude}, ${data.longitude})`}</span>
+            </h1>
+            
+          </div>
+
+          {/* Weather Data - 7 Days */}
+          {data.days.map((day) => {
+            return <p>{day.conditions}</p>
+          })}
+        </div>
+        }
+        
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
